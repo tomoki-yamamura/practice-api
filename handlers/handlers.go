@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // helloHandlerの宣言
 func HelloHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		io.WriteString(w, "Hello, world!\n")
-	} else {
-		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
-	}
+	io.WriteString(w, "Hello, world!\n")
 }
 
 // /article のハンドラ
@@ -35,13 +34,13 @@ func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 
 // /article/1 のハンドラ
 func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
-	articleID := 1
-	resString := fmt.Sprintf("Article No.%d\n", articleID)
-	if req.Method == http.MethodGet {
-		io.WriteString(w, resString)
-	} else {
-		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
+	articleID, err := strconv.Atoi((mux.Vars(req)["id"]))
+	if err != nil {
+		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
+		return
 	}
+	resString := fmt.Sprintf("Article No.%d\n", articleID)
+	io.WriteString(w, resString)
 }
 
 // /article/nice のハンドラ
