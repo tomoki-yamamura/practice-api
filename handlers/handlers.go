@@ -25,11 +25,22 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 
 // /article/list のハンドラ
 func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		io.WriteString(w, "Article List\n")
+	queryMap := req.URL.Query()
+
+	var page int
+	if p, ok := queryMap["page"]; ok && len(p) >0 {
+		var err error
+		page, err = strconv.Atoi(p[0])
+		if err != nil {
+			http.Error(w, "Invalid query parameter", http.StatusBadRequest)
+			return
+		}
 	} else {
-		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
+		page = 1
 	}
+
+	resString := fmt.Sprintf("Article List (page %d)\n", page)
+	io.WriteString(w, resString)
 }
 
 // /article/1 のハンドラ
