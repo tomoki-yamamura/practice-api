@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -50,8 +51,15 @@ func main() {
 		CratedAt: time.Now(),
 	}
 
-	fmt.Printf("%+v\n", article)
-	
+	// fmt.Printf("%+v\n", article)
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", jsonData)
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
