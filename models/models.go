@@ -8,6 +8,7 @@ type Comment struct {
   Message string `json:"message"`
   CreatedAt time.Time `json:"created_at"`
 }
+
 type Article struct {
 	ID int `json:"article_id"`
   Title string `json:"title"`
