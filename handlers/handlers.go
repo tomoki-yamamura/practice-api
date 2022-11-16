@@ -2,11 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"runtime/debug"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -20,21 +18,12 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 
 // /article のハンドラ
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	// バイト列に格納されることになるリクエストボディのサイ ズがまだ分かっていないからです。
-	length, err := strconv.Atoi(req.Header.Get("Content-Length"))
-	if err != nil {
-		http.Error(w, "cannnot get contact length \n", http.StatusBadRequest)
-		return
+	var reqArticle models.Article
+	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
+		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
-	// make 関数を使ってそ の長さのバイトスライスを作成します。
-	reqBodybuffer := make([]byte, length)
-	// 2. Readメソッドでリクエストボディを読み出し
-	if _, err := req.Body.Read(reqBodybuffer); !errors.Is(err, io.EOF) {
-		http.Error(w, "fail to get request body\n", http.StatusBadRequest)
-		return
-	}
-	// 3. ボディを Close する
-	defer req.Body.Close()
+	article := reqArticle
+	json.NewEncoder(w).Encode(article)
 }
 
 // /article/list のハンドラ
