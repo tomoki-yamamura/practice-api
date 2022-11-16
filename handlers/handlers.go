@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"runtime/debug"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -18,17 +20,21 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 
 // /article のハンドラ
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodPost {
-		article := models.Article1
-		jsonData, err := json.Marshal(article)
-		if err != nil {
-			http.Error(w, "fail to encode json\n",  http.StatusInternalServerError)
-			return
-		}
-		w.Write(jsonData)
-	} else {
-		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
+	// バイト列に格納されることになるリクエストボディのサイ ズがまだ分かっていないからです。
+	length, err := strconv.Atoi(req.Header.Get("Content-Length"))
+	if err != nil {
+		http.Error(w, "cannnot get contact length \n", http.StatusBadRequest)
+		return
 	}
+	// make 関数を使ってそ の長さのバイトスライスを作成します。
+	reqBodybuffer := make([]byte, length)
+	// 2. Readメソッドでリクエストボディを読み出し
+	if _, err := req.Body.Read(reqBodybuffer); !errors.Is(err, io.EOF) {
+		http.Error(w, "fail to get request body\n", http.StatusBadRequest)
+		return
+	}
+	// 3. ボディを Close する
+	defer req.Body.Close()
 }
 
 // /article/list のハンドラ
@@ -36,7 +42,7 @@ func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
 
 	var page int
-	if p, ok := queryMap["page"]; ok && len(p) >0 {
+	if p, ok := queryMap["page"]; ok && len(p) > 0 {
 		var err error
 		page, err = strconv.Atoi(p[0])
 		if err != nil {
