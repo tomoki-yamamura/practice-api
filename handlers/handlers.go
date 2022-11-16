@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/tomoki-yamamura/practice-api/models"
+	"github.com/tomoki-yamamura/practice-api/repositories"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // helloHandlerの宣言
@@ -18,11 +21,31 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 
 // /article のハンドラ
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
+
+		dbUser := "docker"
+	dbPassword := "docker"
+	dbDatabase := "sampledb"
+	dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
+
+	db, err := sql.Open("mysql", dbConn)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
 	var reqArticle models.Article
+	fmt.Println(req.Body)
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
-	article := reqArticle
+
+	fmt.Println(reqArticle)
+
+	article, err := repositories.InsertArticle(db, reqArticle)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	json.NewEncoder(w).Encode(article)
 }
 
