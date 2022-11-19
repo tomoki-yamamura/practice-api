@@ -21,7 +21,6 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 
 // /article のハンドラ
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-
 		dbUser := "docker"
 	dbPassword := "docker"
 	dbDatabase := "sampledb"
