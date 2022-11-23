@@ -94,15 +94,14 @@ func UpdateNiceNum(db *sql.DB, articleID int) error {
 		tx.Rollback()
 		return err
 	}
-
 	const sqlUpdateNice = `
 		update articles set nice = ? where article_id = ?
 	`
+	_, err = tx.Exec(sqlUpdateNice, nicenum+1, articleID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-
 	if err := tx.Commit(); err != nil {
 		return err
 	}
