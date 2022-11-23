@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/tomoki-yamamura/practice-api/models"
 )
@@ -76,32 +77,35 @@ func SelectArticleDetail(db *sql.DB, articleID int) (models.Article, error) {
 func UpdateNiceNum(db *sql.DB, articleID int) error {
 	tx, err := db.Begin()
 	if err != nil {
+		fmt.Println(1)
 		return err
 	}
-	const sqlGetNiceStr = `
+
+	const sqlGetNice = `
 		select nice
 		from articles
 		where article_id = ?;
 	`
-	row := tx.QueryRow(sqlGetNiceStr, articleID)
+	row := tx.QueryRow(sqlGetNice, articleID)
 	if err := row.Err(); err != nil {
 		tx.Rollback()
 		return err
 	}
+
 	var nicenum int
 	err = row.Scan(&nicenum)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	const sqlUpdateNice = `
-		update articles set nice = ? where article_id = ?
-	`
+
+	const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
 	_, err = tx.Exec(sqlUpdateNice, nicenum+1, articleID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
+
 	if err := tx.Commit(); err != nil {
 		return err
 	}

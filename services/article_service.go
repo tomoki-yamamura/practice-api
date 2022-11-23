@@ -56,26 +56,47 @@ func PostArticleService(article models.Article) (models.Article, error) {
 	return newArticle, nil
 }
 
+// func PostNiceService(article models.Article) (models.Article, error) {
+// 	db, err := connectDB()
+// 	if err != nil {
+// 		return models.Article{}, err
+// 	}
+// 	defer db.Close()
+// 	err = repositories.UpdateNiceNum(db, article.ID)
+// 	if err != nil {
+// 		return models.Article{}, err
+// 	}
+// 	updateArticle := models.Article{
+// 		ID: article.ID,
+// 		Title: article.Title,
+// 		Contents: article.Contents,
+// 		UserName: article.UserName,
+// 		NiceNum: article.NiceNum + 1,
+// 		CommentList: article.CommentList,
+// 		CreatedAt: article.CreatedAt,
+// 	}
+// 	return updateArticle, nil
+// }
+
 func PostNiceService(article models.Article) (models.Article, error) {
 	db, err := connectDB()
 	if err != nil {
 		return models.Article{}, err
 	}
 	defer db.Close()
+
 	err = repositories.UpdateNiceNum(db, article.ID)
 	if err != nil {
 		return models.Article{}, err
 	}
-	updateArticle := models.Article{
-		ID: article.ID,
-		Title: article.Title,
-		Contents: article.Contents,
-		UserName: article.UserName,
-		NiceNum: article.NiceNum + 1,
-		CommentList: article.CommentList,
+	return models.Article{
+		ID:        article.ID,
+		Title:     article.Title,
+		Contents:  article.Contents,
+		UserName:  article.UserName,
+		NiceNum:   article.NiceNum + 1,
 		CreatedAt: article.CreatedAt,
-	}
-	return updateArticle, nil
+	}, nil
 }
 
 // func PostNiceService(article *models.Article) (models.Article, error) {
