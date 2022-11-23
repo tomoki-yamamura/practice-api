@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	dbUser = os.Getenv("USERNAME")
-	dbPassword = os.Getenv("USERPASS")
-	dbDatabase = os.Getenv("DATABASE")
-	dbConn = fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
+	dbUser     = os.Getenv("DB_USER")
+	dbPassword = os.Getenv("DB_PASSWORD")
+	dbDatabase = os.Getenv("DB_NAME")
+	dbConn     = fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
 )
 
 func connectDB() (*sql.DB, error) {

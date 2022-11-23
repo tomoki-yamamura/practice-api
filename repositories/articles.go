@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/tomoki-yamamura/practice-api/models"
 )
@@ -42,6 +43,7 @@ func SelectArticleList(db *sql.DB, page int) ([]models.Article, error) {
 
 	rows, err := db.Query(sqlStr, articleNumPerPage, ((page - 1) * articleNumPerPage))
 	if err != nil {
+		fmt.Println("fail")
 		return nil, err
 	}
 	defer rows.Close()
