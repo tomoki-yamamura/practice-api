@@ -2,6 +2,7 @@ package services
 
 import "github.com/tomoki-yamamura/practice-api/models"
 
+
 // article関連を引き受けるサービス
 type ArticleServicer interface {
 	PostArticleService(article models.Article) (models.Article, error)
