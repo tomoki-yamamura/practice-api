@@ -63,24 +63,37 @@ func GetArticleService(articleID int) (models.Article, error) {
 
 // PostNiceHandlerで使うことを想定したサービス
 // 指定IDの記事のいいね数を+1して、結果を返却
-func PostNiceService(article models.Article) (models.Article, error) {
+// func PostNiceService(article models.Article) (models.Article, error) {
+// 	db, err := connectDB()
+// 	if err != nil {
+// 		return models.Article{}, err
+// 	}
+// 	defer db.Close()
+
+// 	err = repositories.UpdateNiceNum(db, article.ID)
+// 	if err != nil {
+// 		return models.Article{}, err
+// 	}
+
+// 	return models.Article{
+// 		ID:        article.ID,
+// 		Title:     article.Title,
+// 		Contents:  article.Contents,
+// 		UserName:  article.UserName,
+// 		NiceNum:   article.NiceNum + 1,
+// 		CreatedAt: article.CreatedAt,
+// 	}, nil
+// }
+
+func PostNiceService(article *models.Article) (models.Article, error) {
 	db, err := connectDB()
 	if err != nil {
 		return models.Article{}, err
 	}
-	defer db.Close()
-
-	err = repositories.UpdateNiceNum(db, article.ID)
-	if err != nil {
-		return models.Article{}, err
+	error := repositories.UpdateNiceNum(db, article.ID)
+	if error != nil {
+		return models.Article{}, error
 	}
-
-	return models.Article{
-		ID:        article.ID,
-		Title:     article.Title,
-		Contents:  article.Contents,
-		UserName:  article.UserName,
-		NiceNum:   article.NiceNum + 1,
-		CreatedAt: article.CreatedAt,
-	}, nil
+	article.NiceNum += 1
+	return *article, nil
 }
