@@ -12,12 +12,12 @@ import (
 	"github.com/tomoki-yamamura/practice-api/services"
 )
 
-// helloHandlerの宣言
+// GET /hello のハンドラ
 func HelloHandler(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, "Hello, world!\n")
 }
 
-// /article のハンドラ
+// POST /article のハンドラ
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
@@ -33,10 +33,11 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(article)
 }
 
-// /article/list のハンドラ
+// GET /article/list のハンドラ
 func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
 
+	// クエリパラメータpageを取得
 	var page int
 	if p, ok := queryMap["page"]; ok && len(p) > 0 {
 		var err error
@@ -58,7 +59,7 @@ func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(articleList)
 }
 
-// /article/1 のハンドラ
+// GET /article/{id} のハンドラ
 func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
@@ -75,12 +76,13 @@ func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(article)
 }
 
-// /article/nice のハンドラ
+// POST /article/nice のハンドラ
 func PostNiceHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
+
 	article, err := services.PostNiceService(reqArticle)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
@@ -90,14 +92,17 @@ func PostNiceHandler(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(article)
 }
 
-// /comment のハンドラ
+// POST /comment のハンドラ
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	comment := models.Comment1
-	jsonData, err := json.Marshal(comment)
-	if err != nil {
-		http.Error(w, "fail to encode json\n", http.StatusInternalServerError)
-		return
+	var reqComment models.Comment
+	if err := json.NewDecoder(req.Body).Decode(&reqComment); err != nil {
+		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
 
-	w.Write(jsonData)
+	comment, err := services.PostCommentService(reqComment)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(comment)
 }
