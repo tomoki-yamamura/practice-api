@@ -94,6 +94,6 @@ func PostNiceService(article *models.Article) (models.Article, error) {
 	if error != nil {
 		return models.Article{}, error
 	}
-	article.NiceNum += 1
+	article.UpNiceNum()
 	return *article, nil
 }

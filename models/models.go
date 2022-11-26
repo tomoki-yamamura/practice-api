@@ -19,7 +19,7 @@ type Article struct {
   CreatedAt time.Time `json:"created_at"`
 }
 
-// func (article *Article) upniceNum() (Article) {
-//   article.NiceNum += 1
-// 	return *article
-// }
+func (article *Article) UpNiceNum() (Article) {
+  article.NiceNum += 1
+	return *article
+}
