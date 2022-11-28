@@ -85,9 +85,14 @@ func (s *MyAppService) GetArticleService(articleID int) (models.Article, error) 
 
 func (s *MyAppService) PostNiceService(article *models.Article) (models.Article, error) {
 	fmt.Println("PostNiceService", s.db)
-	error := repositories.UpdateNiceNum(s.db, article.ID)
-	if error != nil {
-		return models.Article{}, error
+	err := repositories.UpdateNiceNum(s.db, article.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = apperrors.NoTargetData.Wrap(err, "does not exist target article")
+			return models.Article{}, err
+		}
+		err = apperrors.UpdateDataFailed.Wrap(err, "fail to update nice count")
+		return models.Article{}, err
 	}
 	article.UpNiceNum()
 	return *article, nil
